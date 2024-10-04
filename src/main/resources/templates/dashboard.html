@@ -45,7 +45,7 @@
                 <td th:text="${status.diskCompliance}">Disk Compliance</td>
                 <td th:text="${status.uptimeCompliance}">Uptime Compliance</td>
                 <td th:text="${status.overallCompliance}">Overall Compliance</td>
-                <td th:text="${status.createdAt}">Checked At</td>
+                <td th:text="${status.checkedAt}">Checked At</td>
             </tr>
         </tbody>
     </table>
@@ -76,7 +76,7 @@
                             <td>${status.diskCompliance}</td>
                             <td>${status.uptimeCompliance}</td>
                             <td>${status.overallCompliance}</td>
-                            <td>${new Date(status.createdAt).toLocaleString()}</td>
+                            <td>${new Date(status.checkedAt).toLocaleString()}</td>
                         `;
 
                         tbody.appendChild(row);
