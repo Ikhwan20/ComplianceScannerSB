@@ -1,0 +1,11 @@
+src/
+ └─ main/
+     ├─ java/com/project/scanner/
+     │   ├─ controller/
+     │   ├─ service/
+     │   ├─ repository/
+     │   ├─ model/
+     │   └─ ComplianceScannerApplication.java
+     └─ resources/
+         ├─ application.properties
+         └─ templates/ (if using Thymeleaf)

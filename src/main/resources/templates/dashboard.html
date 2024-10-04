@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Compliance Dashboard</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Compliance Status Dashboard</h1>
+
+    <button onclick="triggerPlaybook()">Run Compliance Check</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Device Name</th>
+                <th>CPU Compliance</th>
+                <th>Memory Compliance</th>
+                <th>Disk Compliance</th>
+                <th>Uptime Compliance</th>
+                <th>Overall Compliance</th>
+                <th>Checked At</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="status : ${complianceStatuses}">
+                <td th:text="${status.deviceName}">Device Name</td>
+                <td th:text="${status.cpuCompliance}">CPU Compliance</td>
+                <td th:text="${status.memoryCompliance}">Memory Compliance</td>
+                <td th:text="${status.diskCompliance}">Disk Compliance</td>
+                <td th:text="${status.uptimeCompliance}">Uptime Compliance</td>
+                <td th:text="${status.overallCompliance}">Overall Compliance</td>
+                <td th:text="${status.createdAt}">Checked At</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function triggerPlaybook() {
+            fetch('/api/compliance/run-playbook', { method: 'POST' })
+                .then(response => response.text())
+                .then(message => alert(message))
+                .catch(error => alert('Error: ' + error));
+        }
+
+        // Fetch compliance statuses and update the table
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/compliance/statuses')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('tbody');
+                    tbody.innerHTML = ''; // Clear existing rows
+
+                    data.forEach(status => {
+                        const row = document.createElement('tr');
+
+                        row.innerHTML = `
+                            <td>${status.deviceName}</td>
+                            <td>${status.cpuCompliance}</td>
+                            <td>${status.memoryCompliance}</td>
+                            <td>${status.diskCompliance}</td>
+                            <td>${status.uptimeCompliance}</td>
+                            <td>${status.overallCompliance}</td>
+                            <td>${new Date(status.createdAt).toLocaleString()}</td>
+                        `;
+
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching compliance statuses:', error));
+        });
+    </script>
+</body>
+</html>
