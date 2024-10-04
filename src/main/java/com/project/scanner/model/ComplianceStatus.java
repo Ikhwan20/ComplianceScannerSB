@@ -29,8 +29,8 @@ public class ComplianceStatus {
     @Column(name = "overall_compliance", length = 50)
     private String overallCompliance;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "checked_at", updatable = false)
+    private LocalDateTime checkedAt;
 
     public void setId(Long id) {
         this.id = id;
@@ -60,8 +60,8 @@ public class ComplianceStatus {
         this.overallCompliance = overallCompliance;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setCheckedAt(LocalDateTime checkedAt) {
+        this.checkedAt = checkedAt;
     }
 
     public Long getId() {
@@ -92,8 +92,8 @@ public class ComplianceStatus {
         return overallCompliance;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDateTime getCheckedAt() {
+        return checkedAt;
     }
 
     // Constructors
@@ -102,6 +102,6 @@ public class ComplianceStatus {
     
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.checkedAt = LocalDateTime.now();
     }
 }
