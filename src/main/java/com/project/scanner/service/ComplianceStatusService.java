@@ -42,7 +42,7 @@ public class ComplianceStatusService {
             session = jsch.getSession(user, host, port);
 
             // Recommended: set known hosts for security
-            jsch.setKnownHosts("/home/ikhwanmazlan20/.ssh//known_hosts");
+            jsch.setKnownHosts("/home/ikhwanmazlan20/.ssh/known_hosts");
 
             // Disable strict host key checking (not recommended for production)
             session.setConfig("StrictHostKeyChecking", "no");
@@ -50,7 +50,7 @@ public class ComplianceStatusService {
             session.connect();
 
             channel = (ChannelExec) session.openChannel("exec");
-            channel.setCommand("ansible-playbook /home/ikhwanmazlan20/linux-report/linux-report-playbook.yml");
+            channel.setCommand("cd /home/ikhwanmazlan20/linux-report && /home/ikhwanmazlan20/.local/bin/ansible-playbook linux-report-playbook.yml --ask-vault-pass");
             channel.setErrStream(System.err);
             InputStream in = channel.getInputStream();
             channel.connect();
