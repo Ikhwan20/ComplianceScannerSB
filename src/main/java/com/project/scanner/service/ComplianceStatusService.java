@@ -50,7 +50,7 @@ public class ComplianceStatusService {
             session.connect();
 
             channel = (ChannelExec) session.openChannel("exec");
-            channel.setCommand("cd /home/ikhwanmazlan20/linux-report && /home/ikhwanmazlan20/.local/bin/ansible-playbook linux-report-playbook.yml --ask-vault-pass");
+            channel.setCommand("cd /home/ikhwanmazlan20/linux-report && /home/ikhwanmazlan20/.local/bin/ansible-playbook linux-report-playbook.yml --vault-password-file vault_pass.txt");
             channel.setErrStream(System.err);
             InputStream in = channel.getInputStream();
             channel.connect();
