@@ -1,4 +1,4 @@
-version: '3.8'
+version: '1.0'
 
 services:
   postgres:
@@ -30,13 +30,4 @@ services:
       - postgres
     networks:
       - compliance-network
-    # Optional: Mount SSH keys for Ansible playbook execution
-    volumes:
-      - /home/user/.ssh:/home/appuser/.ssh:ro
 
-volumes:
-  postgres_data:
-
-networks:
-  compliance-network:
-    driver: bridge
