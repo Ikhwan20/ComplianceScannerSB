@@ -28,7 +28,11 @@ public class ComplianceStatusService {
 
     public void runAnsiblePlaybook() throws Exception {
 
-        String[] command = { "ansible-playbook", "/home/ikhwanmazlan20/linux-compliance-scanner/linux-report-playbook.yml --vault-password-file vault_pass.txt" };
+        String playbookPath = "/home/ikhwanmazlan20/linux-compliance-scanner/linux-report-playbook.yml"; 
+        String vaultPasswordFile = "/home/ikhwanmazlan20/linux-compliance-scanner/vault_pass.txt"; 
+	String inventoryPath = "/home/ikhwanmazlan20/linux-compliance-scanner/inventory/hosts.yml";
+
+        String[] command = { "ansible-playbook", "-i", inventoryPath, playbookPath, "--vault-password-file", vaultPasswordFile };
 
         // Initialize the ProcessBuilder
         ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -116,4 +120,5 @@ public class ComplianceStatusService {
     //     }
     // }
 }
+
 
