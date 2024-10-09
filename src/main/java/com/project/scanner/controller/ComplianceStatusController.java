@@ -31,7 +31,7 @@ public class ComplianceStatusController {
     @PostMapping("/run-playbook")
     public ResponseEntity<String> runPlaybook() {
         try {
-            complianceService.runAnsiblePlaybookViaSSH(); // or runAnsiblePlaybookViaSSH()
+            complianceService.runAnsiblePlaybook();
             return ResponseEntity.ok("Ansible playbook execution started successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error running playbook: " + e.getMessage());

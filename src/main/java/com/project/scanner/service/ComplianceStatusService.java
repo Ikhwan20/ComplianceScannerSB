@@ -26,57 +26,82 @@ public class ComplianceStatusService {
         return complianceStatusRepository.findAll();
     }
 
-    public void runAnsiblePlaybookViaSSH() throws Exception {
-        String user = "ikhwanmazlan20";
-        String host = "10.128.0.2";
-        int port = 22; // Default SSH port
-        String privateKey = "/home/ikhwanmazlan20/.ssh/id_rsa"; 
+    public void runAnsiblePlaybook() throws Exception {
 
-        JSch jsch = new JSch();
-        jsch.addIdentity(privateKey);
+        String[] command = { "ansible-playbook", "/home/ikhwanmazlan20/linux-compliance-scanner/linux-report-playbook.yml --vault-password-file vault_pass.txt" };
 
-        Session session = null;
-        ChannelExec channel = null;
+        // Initialize the ProcessBuilder
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
 
-        try {
-            session = jsch.getSession(user, host, port);
+        // Redirect error stream to capture errors
+        processBuilder.redirectErrorStream(true);
 
-            // Recommended: set known hosts for security
-            jsch.setKnownHosts("/home/ikhwanmazlan20/.ssh/known_hosts");
+        // Start the process
+        Process process = processBuilder.start();
 
-            // Disable strict host key checking (not recommended for production)
-            session.setConfig("StrictHostKeyChecking", "no");
-
-            session.connect();
-
-            channel = (ChannelExec) session.openChannel("exec");
-            channel.setCommand("cd /home/ikhwanmazlan20/linux-report && /home/ikhwanmazlan20/.local/bin/ansible-playbook linux-report-playbook.yml --vault-password-file vault_pass.txt");
-            channel.setErrStream(System.err);
-            InputStream in = channel.getInputStream();
-            channel.connect();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        // Capture the output
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
             }
+        }
 
-            int exitStatus = channel.getExitStatus();
-            if (exitStatus != 0) {
-                throw new RuntimeException("Ansible playbook failed with exit status " + exitStatus);
-            }
-
-        } catch (JSchException | IOException e) {
-            throw new Exception("SSH Execution failed: " + e.getMessage(), e);
-        } finally {
-            if (channel != null && channel.isConnected()) {
-                channel.disconnect();
-            }
-            if (session != null && session.isConnected()) {
-                session.disconnect();
-            }
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new RuntimeException("Ansible playbook execution failed with exit code " + exitCode);
         }
     }
+
+    // public void runAnsiblePlaybookViaSSH() throws Exception {
+    //     String user = "ikhwanmazlan20";
+    //     String host = "10.128.0.2";
+    //     int port = 22; 
+    //     String privateKey = "/home/ikhwanmazlan20/.ssh/id_rsa"; 
+
+    //     JSch jsch = new JSch();
+    //     jsch.addIdentity(privateKey);
+
+    //     Session session = null;
+    //     ChannelExec channel = null;
+
+    //     try {
+    //         session = jsch.getSession(user, host, port);
+
+    //         jsch.setKnownHosts("/home/ikhwanmazlan20/.ssh/known_hosts");
+
+    //         session.setConfig("StrictHostKeyChecking", "no");
+
+    //         session.connect();
+
+    //         channel = (ChannelExec) session.openChannel("exec");
+    //         channel.setCommand("cd /home/ikhwanmazlan20/linux-report && /home/ikhwanmazlan20/.local/bin/ansible-playbook linux-report-playbook.yml --vault-password-file vault_pass.txt");
+    //         channel.setErrStream(System.err);
+    //         InputStream in = channel.getInputStream();
+    //         channel.connect();
+
+    //         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+    //         String line;
+    //         while ((line = reader.readLine()) != null) {
+    //             System.out.println(line);
+    //         }
+
+    //         int exitStatus = channel.getExitStatus();
+    //         if (exitStatus != 0) {
+    //             throw new RuntimeException("Ansible playbook failed with exit status " + exitStatus);
+    //         }
+
+    //     } catch (JSchException | IOException e) {
+    //         throw new Exception("SSH Execution failed: " + e.getMessage(), e);
+    //     } finally {
+    //         if (channel != null && channel.isConnected()) {
+    //             channel.disconnect();
+    //         }
+    //         if (session != null && session.isConnected()) {
+    //             session.disconnect();
+    //         }
+    //     }
+    // }
 
     // Execute playbook via REST API on core server
     // public void runAnsiblePlaybook() throws Exception {
