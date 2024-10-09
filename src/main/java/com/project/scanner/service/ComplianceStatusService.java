@@ -33,7 +33,6 @@ public class ComplianceStatusService {
         // Initialize the ProcessBuilder
         ProcessBuilder processBuilder = new ProcessBuilder(command);
 
-        // Redirect error stream to capture errors
         processBuilder.redirectErrorStream(true);
 
         // Start the process
