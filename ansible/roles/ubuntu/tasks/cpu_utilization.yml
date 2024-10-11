@@ -1,0 +1,6 @@
+---
+- name: CPU Utilization
+  block:
+    - name: Gather CPU Utilization
+      shell: top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}'      
+      register: cpu_utilization

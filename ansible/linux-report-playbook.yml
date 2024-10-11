@@ -1,0 +1,66 @@
+---
+- name: Compliance Check for Devices
+  hosts: ubuntu
+  gather_facts: False
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+  
+    - name: Gather CPU Utilization
+      ansible.builtin.include_role:
+        name: ubuntu
+        tasks_from: cpu_utilization.yml
+
+    - name: Gather Free Memory
+      shell: free -m | grep Mem | awk '{print $4}'
+      register: free_memory
+
+    - name: Gather Disk Usage
+      shell: df -h / | grep / | awk '{print $5}' | sed 's/%//g'
+      register: disk_usage
+
+    - name: Gather Uptime
+      shell: awk '{print $1}' /proc/uptime
+      register: uptime
+
+    - name: Define Compliance Criteria and Check Compliance
+      set_fact:
+        cpu_compliance: "{{ 'Compliant' if cpu_utilization.stdout|float < 75 else 'Not Compliant' }}"
+        memory_compliance: "{{ 'Compliant' if free_memory.stdout|int > 500 else 'Not Compliant' }}"
+        disk_compliance: "{{ 'Compliant' if disk_usage.stdout|int < 85 else 'Not Compliant' }}"
+        uptime_compliance: "{{ 'Compliant' if (uptime.stdout|float / 86400) > 7 else 'Not Compliant' }}"
+
+    - name: Determine Overall Compliance
+      set_fact:
+        overall_compliance: >-
+          {{ 'Compliant' if cpu_compliance == 'Compliant' 
+                          and memory_compliance == 'Compliant' 
+                          and disk_compliance == 'Compliant' 
+                          and uptime_compliance == 'Compliant'
+                          else 'Not Compliant' }}
+
+    - name: Output Compliance Status
+      debug:
+        msg: "Device Compliance Status: {{ overall_compliance }}"
+
+    - name: Output Detailed Compliance Information
+      debug:
+        msg:
+          - "CPU Compliance: {{ cpu_compliance }}"
+          - "Memory Compliance: {{ memory_compliance }}"
+          - "Disk Usage Compliance: {{ disk_compliance }}"
+          - "Uptime Compliance: {{ uptime_compliance }}"
+
+    - name: Insert Compliance Status into PostgreSQL Database
+      delegate_to: localhost
+      community.postgresql.postgresql_query:
+        login_host: "{{ db_host }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_password }}"
+        db: "{{ db_name }}"
+        port: "{{ db_port }}"        
+        query: >
+          INSERT INTO compliance_status (device_name, cpu_compliance, memory_compliance, disk_compliance, uptime_compliance, overall_compliance)
+          VALUES ('{{ inventory_hostname }}', '{{ cpu_compliance }}', '{{ memory_compliance }}', '{{ disk_compliance }}', '{{ uptime_compliance }}', '{{ overall_compliance }}');
+
