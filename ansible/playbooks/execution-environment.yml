@@ -15,4 +15,3 @@ dependencies:
   galaxy:
     collections:
     - name: community.postgresql
-

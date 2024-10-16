@@ -28,11 +28,14 @@ public class ComplianceStatusService {
 
     public void runAnsiblePlaybook() throws Exception {
 
-        String playbookPath = "/home/ikhwanmazlan20/linux-compliance-scanner/linux-report-playbook.yml"; 
-        String vaultPasswordFile = "/home/ikhwanmazlan20/linux-compliance-scanner/vault_pass.txt"; 
-	String inventoryPath = "/home/ikhwanmazlan20/linux-compliance-scanner/inventory/hosts.yml";
+        String playbookPath = "ansible/playbooks/linux-report-playbook.yml"; 
+        String vaultPasswordFile = "ansible/playbooks/vault_pass.txt"; 
+	String inventoryPath = "ansible/playbooks/inventory";
+	String imageName = "ansible_ee:latest";
 
-        String[] command = { "ansible-playbook", "-i", inventoryPath, playbookPath, "--vault-password-file", vaultPasswordFile };
+	String userName = "ikhwanmazlan20";
+
+        String[] command = { "ansible-navigator", "run", playbookPath, "-i", inventoryPath, "--execution-environment-image", imageName, "--mode", "stdout", "--pull-policy", "missing","--enable-prompts", "-u", userName, "--vault-password-file", vaultPasswordFile };
 
         // Initialize the ProcessBuilder
         ProcessBuilder processBuilder = new ProcessBuilder(command);
